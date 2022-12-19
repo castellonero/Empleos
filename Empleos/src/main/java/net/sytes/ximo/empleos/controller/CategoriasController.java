@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import net.sytes.ximo.empleos.model.Categoria;
@@ -34,9 +33,19 @@ public class CategoriasController {
 	}
 	  
 	@GetMapping("/create")
-	public String crear(Categoria categoria) {
+	public String crear(Categoria categoria, Model model) {
+		model.addAttribute("categoria", categoria);
 		return "categorias/formCategoria";
 	}
+	
+	@GetMapping("/edit/{id}")
+	public String editar(@PathVariable("id") int idCategoria,Model model)  {
+		Categoria categoria = serviceCategorias.buscarPorId(idCategoria);
+		model.addAttribute("categoria", categoria);
+		return "/categorias/formCategoria";
+	
+	}
+		
 	  
 	@PostMapping("/save")
 	public String guardar(Categoria categoria, BindingResult result,  RedirectAttributes attributes)  {
@@ -53,13 +62,12 @@ public class CategoriasController {
 	
 	}
 	
-	@GetMapping("/delete")
-	public String eliminar(@RequestParam("id") int idCategoria, Model model)  {
+	@GetMapping("/delete/{id}")
+	public String eliminar(@PathVariable("id") int idCategoria, Model model,  RedirectAttributes attributes)  {
 		System.out.println("Borrando categoria con ID: " + idCategoria);
-		model.addAttribute("id", idCategoria);
-
-		return "mensaje";
-	
+	    serviceCategorias.eliminar(idCategoria);
+		attributes.addFlashAttribute("msg", "La categoria se ha eliminado");
+		return "redirect:/categorias/index";
 	}
 	
 	@GetMapping("/view/{id}")

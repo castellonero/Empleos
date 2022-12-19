@@ -8,7 +8,8 @@ public interface ICategoriasService {
 
 		List<Categoria> buscarTodas();
 		Categoria buscarPorId(Integer idCategoria);	
-		void guardar(Categoria Categoria);
+		void guardar(Categoria categoria);
+		void eliminar(Integer idCategoria);
 
 	}
 

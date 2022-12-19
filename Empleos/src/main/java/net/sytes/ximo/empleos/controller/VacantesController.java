@@ -14,6 +14,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,10 +53,18 @@ public class VacantesController {
 	
 	@GetMapping("/create")
 	public String crear(Vacante vacante, Model model)  {
-		model.addAttribute("categorias", serviceCategorias.buscarTodas());
 		return "vacantes/formVacante";
 	
 	}
+	
+	@GetMapping("/edit/{id}")
+	public String editar(@PathVariable("id") int idVacante,Model model)  {
+		Vacante	vacante = serviceVacantes.buscarPorId(idVacante);
+		model.addAttribute("vacante", vacante);
+		return "/vacantes/formVacante";
+	
+	}
+			
 	
 	@PostMapping("/save")
 	public String guardar(Vacante vacante, BindingResult result,  RedirectAttributes attributes, @RequestParam("archivoImagen") MultipartFile multiPart)  {
@@ -83,12 +92,12 @@ public class VacantesController {
 	
 	}
 	
-	@GetMapping("/delete")
-	public String eliminar(@RequestParam("id") int idVacante, Model model)  {
+	@GetMapping("/delete/{id}")
+	public String eliminar(@PathVariable("id") int idVacante, Model model,  RedirectAttributes attributes)  {
 		System.out.println("Borrando vacante con ID: " + idVacante);
-		model.addAttribute("id", idVacante);
-
-		return "mensaje";
+		serviceVacantes.eliminar(idVacante);
+		attributes.addFlashAttribute("msg", "La vacante se ha eliminado");
+		return "redirect:/vacantes/index";
 	
 	}
 	
@@ -100,6 +109,12 @@ public class VacantesController {
 		model.addAttribute("vacante", vacante);	
 		return "detalle";
    }
+	
+	@ModelAttribute
+	public void setGenericos(Model model) {
+		model.addAttribute("categorias", serviceCategorias.buscarTodas());
+	}
+	
 	
 	@InitBinder
 	public void initBinder(WebDataBinder webDataBinder) {
